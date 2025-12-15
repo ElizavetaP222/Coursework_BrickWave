@@ -3,14 +3,14 @@
 
 class Paddle : public GameObject {
 private:
-    float speed;
-    int moveDirection; // -1 left, 0 none, 1 right
-    float baseWidth;
+    float paddle_speed;
+    int move_direction; // -1 left, 0 none, 1 right
+    float base_width_paddle;
 
 public:
     Paddle();
 
-    void HandleInput();
-    void ApplyBonus();
-    void ResetSize();
+    void HandleInputPaddle();
+    void ApplyBonusPaddle();
+    void ResetSizePaddle();
 };
