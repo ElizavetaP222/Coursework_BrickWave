@@ -1,16 +1,26 @@
 #pragma once
 #include "GameObject.hpp"
+#include <SFML/Window/Keyboard.hpp>
 
 class Paddle : public GameObject {
 private:
+    // скорость перемещения платформы
     float paddle_speed;
-    int move_direction; // -1 left, 0 none, 1 right
+    // направление движения -1 влево, 0 стоп, 1 вправо
+    int move_direction;
+    // исходная ширина платформы для сброса эффектов бонусов
     float base_width_paddle;
 
 public:
     Paddle();
 
+    // обработка ввода пользователя клавиши A D или стрелки
     void HandleInputPaddle();
+    // применение эффекта бонуса изменение ширины
     void ApplyBonusPaddle();
+    // сброс размера платформы к исходному
     void ResetSizePaddle();
+    void DrawObject(sf::RenderWindow& window) override;
+    void UpdateObject(float delta_time) override;
+    sf::FloatRect GetBoundingBox() const override;
 };

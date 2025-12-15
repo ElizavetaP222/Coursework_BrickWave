@@ -13,7 +13,13 @@ private:
     sf::Texture texture_bonus;
 
 public:
-    Bonus();
+    Bonus(BonusType type, float start_x, float start_y);
 
+    // применение эффекта бонуса к объектам игры
     void ApplyEffectBonus(Paddle& paddle, Ball& ball, GameState& game_state);
+
+    // полиморфизм обязательные методы
+    void DrawObject(sf::RenderWindow& window) override;
+    void UpdateObject(float delta_time) override;
+    sf::FloatRect GetBoundingBox() const override;
 };
