@@ -1,6 +1,8 @@
 #pragma once
+#include <vector>           
 #include "Ball.hpp"
 #include "Paddle.hpp"
+#include "Brick.hpp"       
 #include "Bonus.hpp"
 #include "GameState.hpp"
 
@@ -11,6 +13,7 @@ private:
 
 public:
     void CheckBallVsPaddle(Ball& ball, Paddle& paddle);
-    void CheckBallVsWalls(Ball& ball, GameState& game_state);  
+    void CheckBallVsWalls(Ball& ball, GameState& game_state);
     void CheckBonusVsPaddle(Bonus& bonus, Paddle& paddle);
+    void CheckBallVsBricks(Ball& ball, std::vector<Brick>& bricks, GameState& game_state);
 };

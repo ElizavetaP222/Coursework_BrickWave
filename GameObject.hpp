@@ -24,4 +24,5 @@ public:
     virtual void UpdateObject(float delta_time) {}
     // возвращает границы объекта для проверки столкновений
     virtual sf::FloatRect GetBoundingBox() const { return {}; }
+    bool IsActive() const { return flag_active; }
 };

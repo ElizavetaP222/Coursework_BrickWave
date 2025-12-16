@@ -17,6 +17,8 @@ Brick::Brick(int start_x, int start_y, BrickType type) {
         hit_points = 1; max_hit_points = 1; score_value = 50; break;
     case multi_hit_brick:
         hit_points = 5; max_hit_points = 5; score_value = 100; break;
+    case super_brick:
+        hit_points = 7; max_hit_points = 7; score_value = 200; break;
     }
 
     flag_active = true;
@@ -31,11 +33,15 @@ void Brick::OnHitBrick() {
 }
 
 sf::Color Brick::GetColorBrick() const {
-    float health_ratio = static_cast<float>(hit_points) / max_hit_points;
-    if (health_ratio >= 0.7f) return sf::Color::Red;
-    if (health_ratio >= 0.4f) return sf::Color::Yellow;
-    return sf::Color::Green;
+    switch (brick_type) {
+    case normal_brick: return sf::Color::Green;
+    case strong_brick: return sf::Color::Yellow;
+    case exploding_brick: return sf::Color::Blue;
+    case super_brick: return sf::Color::Red;
+    default: return sf::Color::White;
+    }
 }
+
 
 // полиморфный метод переопределение из GameObject
 void Brick::DrawObject(sf::RenderWindow& window) {
@@ -58,3 +64,4 @@ void Brick::UpdateObject(float delta_time) {
 sf::FloatRect Brick::GetBoundingBox() const {
     return sf::FloatRect(pos_x, pos_y, object_width, object_height);
 }
+

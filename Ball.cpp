@@ -6,17 +6,17 @@ Ball::Ball() {
     pos_y = 500.0f;
     object_radius = 8.0f;
     base_speed = 300.0f;
-    vector_x = 0;
-    vector_y = 0;
-    flag_stuck_to_paddle = true;
+    vector_x = base_speed * 0.7f;      
+    vector_y = -base_speed * 0.8f;     
+    flag_stuck_to_paddle = false;      
     flag_active = true;
 }
 
-void Ball::MoveBall() {
-    if (flag_stuck_to_paddle) return;
 
-    pos_x += vector_x * 0.016f;
-    pos_y += vector_y * 0.016f;
+void Ball::MoveBall(float delta_time) { 
+    if (flag_stuck_to_paddle) return;
+    pos_x += vector_x * delta_time;     
+    pos_y += vector_y * delta_time;
 }
 
 void Ball::BounceBall(std::string direction) {
@@ -29,16 +29,21 @@ void Ball::BounceBall(std::string direction) {
 }
 
 void Ball::ActivateBall() {
+    if (!flag_stuck_to_paddle) return;  // уже активен!
+
     flag_stuck_to_paddle = false;
     vector_x = base_speed * 0.7f;
-    vector_y = -base_speed * 0.7f;
+    vector_y = -base_speed * 0.8f;
 }
+
 
 void Ball::ApplySpeedModifier(float modifier) {
     float current_speed = sqrt(vector_x * vector_x + vector_y * vector_y);
-    float new_speed = base_speed * modifier;
-    vector_x = (vector_x / current_speed) * new_speed;
-    vector_y = (vector_y / current_speed) * new_speed;
+    if (current_speed > 0) {  // защита от деления на 0
+        float new_speed = base_speed * modifier;
+        vector_x = (vector_x / current_speed) * new_speed;
+        vector_y = (vector_y / current_speed) * new_speed;
+    }
 }
 
 // полиморфный метод переопределение из GameObject
@@ -55,7 +60,7 @@ void Ball::DrawObject(sf::RenderWindow& window) {
 
 // полиморфный метод переопределение из GameObject
 void Ball::UpdateObject(float delta_time) {
-    MoveBall();
+    MoveBall(delta_time);  
 }
 
 // полиморфный метод переопределение из GameObject
@@ -71,3 +76,8 @@ bool Ball::IsStuckToPaddle() const {
 void Ball::SetStuckToPaddle(bool stuck) {
     flag_stuck_to_paddle = stuck;
 }
+void Ball::SetPosition(float new_x, float new_y) {
+    pos_x = new_x;
+    pos_y = new_y;
+}
+

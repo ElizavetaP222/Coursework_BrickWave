@@ -1,7 +1,13 @@
 #pragma once
 #include "GameObject.hpp"
 
-enum BrickType { normal_brick, strong_brick, exploding_brick, multi_hit_brick };
+enum BrickType {
+    normal_brick,      // 1 удар, зеленый
+    strong_brick,      // 3 удара, желтый 
+    exploding_brick,   // 1 удар, синий
+    multi_hit_brick,   // 5 ударов, оранжевый
+    super_brick        // 7 ударов, красный
+};
 
 class Brick : public GameObject {
 private:
@@ -18,7 +24,7 @@ private:
 
 public:
     Brick(int start_x, int start_y, BrickType type);
-
+    int GetScoreValue() const { return score_value; }
     // обработка попадани€ м€ча
     void OnHitBrick();
     // цвет кирпича по текущей прочности

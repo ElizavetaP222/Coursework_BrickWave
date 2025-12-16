@@ -16,7 +16,7 @@ public:
     Ball();
 
     // обновление позиции м€ча
-    void MoveBall();
+    void MoveBall(float delta_time);
     void BounceBall(std::string direction);
     void ActivateBall();
     void ApplySpeedModifier(float modifier);
