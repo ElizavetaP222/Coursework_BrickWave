@@ -1,4 +1,4 @@
-#include <SFML/Graphics.hpp>
+п»ї#include <SFML/Graphics.hpp>
 #include <vector>
 #include "GameObject.hpp"
 #include "Paddle.hpp"
@@ -20,25 +20,33 @@ int main() {
     GameState game_state_obj;
     CollisionManager collision_manager;
 
-    // АВТОЗАПУСК МЯЧА
+    // РђР’РўРћР—РђРџРЈРЎРљ РњРЇР§Рђ
     ball_obj.SetStuckToPaddle(false);
-    ball_obj.vector_x = 210.0f;  // вправо
-    ball_obj.vector_y = -240.0f; // ВВЕРХ
+    ball_obj.vector_x = 210.0f;  // РІРїСЂР°РІРѕ
+    ball_obj.vector_y = -240.0f; // Р’Р’Р•Р РҐ
 
-    // создание первого уровня кирпичей
+    // СЃРѕР·РґР°РЅРёРµ РїРµСЂРІРѕРіРѕ СѓСЂРѕРІРЅСЏ РєРёСЂРїРёС‡РµР№
     std::vector<Brick> bricks;
-    for (int row = 0; row < 5; row++) {
-        for (int col = 0; col < 12; col++) {
-            float x = 40 + col * 65;
-            float y = 50 + row * 35;
+    for (int row = 0; row < 6; row++) {
+        float base_y = 60 + row * 32;
+
+        for (int col = 0; col < 11; col++) { 
+            float x = 30 + col * 65;          
+            float y = base_y;
+
+            if (x + 55 > 775 || y + 22 > 300) continue;
+
             BrickType type = static_cast<BrickType>(rand() % 5);
             bricks.emplace_back(x, y, type);
         }
     }
 
+
+
+
     sf::Font font;
     if (!font.loadFromFile("arial.ttf")) {
-        // шрифт не найден используем заглушку
+        // С€СЂРёС„С‚ РЅРµ РЅР°Р№РґРµРЅ РёСЃРїРѕР»СЊР·СѓРµРј Р·Р°РіР»СѓС€РєСѓ
     }
 
     sf::Clock clock;
@@ -46,24 +54,24 @@ int main() {
     while (window.isOpen()) {
         float delta_time = clock.restart().asSeconds();
 
-        // события
+        // СЃРѕР±С‹С‚РёСЏ
         sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) window.close();
         }
 
-        // 1. ПЛАТФОРМА
+        // 1. РџР›РђРўР¤РћР РњРђ
         paddle_obj.UpdateObject(delta_time);
 
-        // 2. СТОЛКНОВЕНИЯ
+        // 2. РЎРўРћР›РљРќРћР’Р•РќРРЇ
         collision_manager.CheckBallVsPaddle(ball_obj, paddle_obj);
         collision_manager.CheckBallVsWalls(ball_obj, game_state_obj);
         collision_manager.CheckBallVsBricks(ball_obj, bricks, game_state_obj);
 
-        // 3. МЯЧ
+        // 3. РњРЇР§
         ball_obj.UpdateObject(delta_time);
 
-        // отрисовка
+        // РѕС‚СЂРёСЃРѕРІРєР°
         window.clear(sf::Color::Black);
         paddle_obj.DrawObject(window);
         ball_obj.DrawObject(window);

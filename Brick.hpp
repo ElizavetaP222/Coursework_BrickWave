@@ -2,11 +2,11 @@
 #include "GameObject.hpp"
 
 enum BrickType {
-    normal_brick,      // 1 удар, зеленый
-    strong_brick,      // 3 удара, желтый 
-    exploding_brick,   // 1 удар, синий
-    multi_hit_brick,   // 5 ударов, оранжевый
-    super_brick        // 7 ударов, красный
+    normal_brick,     
+    strong_brick,     
+    exploding_brick,  
+    multi_hit_brick,   
+    super_brick        
 };
 
 class Brick : public GameObject {
@@ -32,5 +32,6 @@ public:
     void DrawObject(sf::RenderWindow& window) override;
     void UpdateObject(float delta_time) override;
     sf::FloatRect GetBoundingBox() const override;
+    sf::Color GetColorByHits() const;
 
 };
