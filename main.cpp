@@ -49,10 +49,10 @@ int main() {
             }
         }
 
-        // синхронизаци€ прилипшего м€ча с платформой
-        if (ball_obj.flag_stuck_to_paddle) {
-            ball_obj.pos_x = paddle_obj.pos_x + paddle_obj.object_width / 2;
-            ball_obj.pos_y = paddle_obj.pos_y - 50;
+        // синхронизаци€ прилипшего м€ча с платформой через публичные методы
+        if (ball_obj.IsStuckToPaddle()) {
+            sf::FloatRect paddle_box = paddle_obj.GetBoundingBox();
+            ball_obj.SetPosition(paddle_box.left + paddle_box.width / 2, paddle_box.top - 50);
         }
 
         // обновление объектов
@@ -79,8 +79,8 @@ int main() {
         ui_text.setCharacterSize(24);
         ui_text.setFillColor(sf::Color::White);
         ui_text.setPosition(10, 10);
-        ui_text.setString("Score: " + std::to_string(game_state_obj.score_game) +
-            " Lives: " + std::to_string(game_state_obj.lives_game));
+        ui_text.setString("Score: " + std::to_string(game_state_obj.GetScore()) +
+            " Lives: " + std::to_string(game_state_obj.GetLives()));
         window.draw(ui_text);
 
         window.display();

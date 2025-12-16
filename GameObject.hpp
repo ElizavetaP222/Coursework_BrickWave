@@ -17,7 +17,7 @@ protected:
 public:
     GameObject();
     virtual ~GameObject() = default;
-
+    virtual void Deactivate() { flag_active = false; }
     // отрисовка объекта на экране
     virtual void DrawObject(sf::RenderWindow& window) {}
     // обновление состояния объекта с учетом времени

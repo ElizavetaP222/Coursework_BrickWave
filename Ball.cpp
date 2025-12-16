@@ -63,3 +63,11 @@ sf::FloatRect Ball::GetBoundingBox() const {
     return sf::FloatRect(pos_x - object_radius, pos_y - object_radius,
         object_radius * 2, object_radius * 2);
 }
+
+bool Ball::IsStuckToPaddle() const {
+    return flag_stuck_to_paddle;
+}
+
+void Ball::SetStuckToPaddle(bool stuck) {
+    flag_stuck_to_paddle = stuck;
+}

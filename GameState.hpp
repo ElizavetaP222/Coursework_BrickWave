@@ -28,4 +28,7 @@ public:
     void ResetGameState();
     // загрузка уровня
     void LoadLevelGame(int level);
+
+    int GetScore() const { return score_game; }
+    int GetLives() const { return lives_game; }
 };

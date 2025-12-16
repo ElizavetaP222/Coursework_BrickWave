@@ -1,6 +1,7 @@
 #pragma once
 #include "Brick.hpp"
 #include <vector>
+#include "Ball.hpp"
 
 class Level {
 private:
