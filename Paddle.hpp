@@ -13,7 +13,8 @@ private:
 
 public:
     Paddle();
-
+    void SetPosition(float x, float y);
+    float GetWidth() const { return object_width; }
     // обработка ввода пользователя клавиши A D или стрелки
     void HandleInputPaddle();
     // применение эффекта бонуса изменение ширины

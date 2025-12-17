@@ -1,21 +1,20 @@
-#include "Ball.hpp"
+п»ї#include "Ball.hpp"
 #include <cmath>
 
 Ball::Ball() {
     pos_x = 400.0f;
     pos_y = 500.0f;
-    object_radius = 8.0f;
+    object_radius = 10.0f;
     base_speed = 300.0f;
-    vector_x = base_speed * 0.7f;      
-    vector_y = -base_speed * 0.8f;     
-    flag_stuck_to_paddle = false;      
+    vector_x = base_speed * 0.7f;
+    vector_y = -base_speed * 0.8f;
+    flag_stuck_to_paddle = false;
     flag_active = true;
 }
 
-
-void Ball::MoveBall(float delta_time) { 
+void Ball::MoveBall(float delta_time) {
     if (flag_stuck_to_paddle) return;
-    pos_x += vector_x * delta_time;     
+    pos_x += vector_x * delta_time;
     pos_y += vector_y * delta_time;
 }
 
@@ -29,41 +28,21 @@ void Ball::BounceBall(std::string direction) {
 }
 
 void Ball::ActivateBall() {
-    if (!flag_stuck_to_paddle) return;  // уже активен!
-
+    if (!flag_stuck_to_paddle) return;
     flag_stuck_to_paddle = false;
     vector_x = base_speed * 0.7f;
     vector_y = -base_speed * 0.8f;
 }
 
-
 void Ball::ApplySpeedModifier(float modifier) {
     float current_speed = sqrt(vector_x * vector_x + vector_y * vector_y);
-    if (current_speed > 0) {  // защита от деления на 0
+    if (current_speed > 0) {
         float new_speed = base_speed * modifier;
         vector_x = (vector_x / current_speed) * new_speed;
         vector_y = (vector_y / current_speed) * new_speed;
     }
 }
 
-// полиморфный метод переопределение из GameObject
-void Ball::DrawObject(sf::RenderWindow& window) {
-    if (!flag_active) return;
-
-    sf::CircleShape ball_shape(object_radius);
-    ball_shape.setPosition(pos_x - object_radius, pos_y - object_radius);
-    ball_shape.setFillColor(sf::Color::Cyan);
-    ball_shape.setOutlineThickness(2);
-    ball_shape.setOutlineColor(sf::Color::Blue);
-    window.draw(ball_shape);
-}
-
-// полиморфный метод переопределение из GameObject
-void Ball::UpdateObject(float delta_time) {
-    MoveBall(delta_time);  
-}
-
-// полиморфный метод переопределение из GameObject
 sf::FloatRect Ball::GetBoundingBox() const {
     return sf::FloatRect(pos_x - object_radius, pos_y - object_radius,
         object_radius * 2, object_radius * 2);
@@ -76,8 +55,61 @@ bool Ball::IsStuckToPaddle() const {
 void Ball::SetStuckToPaddle(bool stuck) {
     flag_stuck_to_paddle = stuck;
 }
+
 void Ball::SetPosition(float new_x, float new_y) {
     pos_x = new_x;
     pos_y = new_y;
 }
+
+void Ball::SetActive(bool active) {
+    flag_active = active;
+}
+
+void Ball::StartRespawn(float time) {
+    respawnTimeLeft = time;  
+    respawnBlink = true;
+    flag_active = true;
+    flag_stuck_to_paddle = true;
+}
+
+
+void Ball::UpdateObject(float delta_time) {
+    if (respawnTimeLeft > 0.0f) {
+        respawnTimeLeft -= delta_time;
+        if (respawnTimeLeft <= 0.0f) {
+            respawnBlink = false;
+            flag_stuck_to_paddle = false;
+            vector_x = base_speed * 0.7f;
+            vector_y = -base_speed * 0.8f;
+        }
+    }
+    MoveBall(delta_time);
+    if (fabs(vector_x) < 1.0f && fabs(vector_y) < 1.0f) {
+        vector_x = base_speed * 0.7f;
+        vector_y = -base_speed * 0.8f;
+    }
+}
+
+void Ball::DrawObject(sf::RenderWindow& window) {
+    if (!flag_active) return;
+
+    // РњРёРіР°РЅРёРµ РїСЂРё СЂРµСЃРїР°СѓРЅРµ
+    if (respawnBlink && respawnTimeLeft > 0.0f) {
+        // РџСЂРѕСЃС‚РѕРµ РјРёРіР°РЅРёРµ: РІРєР» 0.15СЃ в†’ РІС‹РєР» 0.05СЃ
+        float blinkPhase = fmod(respawnTimeLeft, 0.2f);
+        if (blinkPhase > 0.15f) {  // РІС‹РєР» С‚РѕР»СЊРєРѕ РїРѕСЃР»РµРґРЅРёРµ 0.05СЃ
+            return;
+        }
+    }
+
+    // Р РёСЃСѓРµРј РјСЏС‡
+    sf::CircleShape ballShape(object_radius);
+    ballShape.setPosition(pos_x - object_radius, pos_y - object_radius);
+    ballShape.setFillColor(sf::Color::White);
+    ballShape.setOutlineThickness(2);
+    ballShape.setOutlineColor(sf::Color(100, 100, 100));
+    window.draw(ballShape);
+}
+
+
 

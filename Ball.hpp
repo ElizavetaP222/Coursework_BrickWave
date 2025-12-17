@@ -1,31 +1,33 @@
-#pragma once
+ï»¿#pragma once
 #include "GameObject.hpp"
 
 class Ball : public GameObject {
 public:
-    // êîìïîíåíòû âåêòîðà ñêîðîñòè ìÿ÷à
+    // ÐºÐ¾Ð¼Ð¿Ð¾Ð½ÐµÐ½Ñ‚Ñ‹ Ð²ÐµÐºÑ‚Ð¾Ñ€Ð° ÑÐºÐ¾Ñ€Ð¾ÑÑ‚Ð¸ Ð¼ÑÑ‡Ð°
     float vector_x;
     float vector_y;
-    // áàçîâàÿ ñêîðîñòü äëÿ ñáðîñà ýôôåêòîâ áîíóñîâ
+    // Ð±Ð°Ð·Ð¾Ð²Ð°Ñ ÑÐºÐ¾Ñ€Ð¾ÑÑ‚ÑŒ Ð´Ð»Ñ ÑÐ±Ñ€Ð¾ÑÐ° ÑÑ„Ñ„ÐµÐºÑ‚Ð¾Ð² Ð±Ð¾Ð½ÑƒÑÐ¾Ð²
     float base_speed;
+    float respawnTimeLeft = 0.0f;
+    bool respawnBlink = false;
 
-private:  
-    bool flag_stuck_to_paddle;  
+private:
+    bool flag_stuck_to_paddle;
 
 public:
     Ball();
-
-    // îáíîâëåíèå ïîçèöèè ìÿ÷à
+    void SetActive(bool active);
+    // Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸ Ð¼ÑÑ‡Ð°
     void MoveBall(float delta_time);
     void BounceBall(std::string direction);
     void ActivateBall();
     void ApplySpeedModifier(float modifier);
-
     void DrawObject(sf::RenderWindow& window) override;
-    void UpdateObject(float delta_time) override;
+    virtual void UpdateObject(float delta_time) override;
     sf::FloatRect GetBoundingBox() const override;
-
     bool IsStuckToPaddle() const;
     void SetPosition(float new_x, float new_y);
     void SetStuckToPaddle(bool stuck);
+    void StartRespawn(float time);
+    bool IsRespawning() const { return respawnTimeLeft > 0.0f; }
 };

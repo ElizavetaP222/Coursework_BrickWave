@@ -4,7 +4,7 @@
 Paddle::Paddle() {
     pos_x = 350.0f;
     pos_y = 550.0f;
-    object_width = 100.0f;
+    object_width = 90.0f;
     object_height = 20.0f;
     paddle_speed = 400.0f;
     move_direction = 0;
@@ -52,4 +52,8 @@ void Paddle::UpdateObject(float delta_time) {
 
 sf::FloatRect Paddle::GetBoundingBox() const {
     return sf::FloatRect(pos_x, pos_y, object_width, object_height);
+}
+void Paddle::SetPosition(float x, float y) {
+    pos_x = x;
+    pos_y = y;
 }
