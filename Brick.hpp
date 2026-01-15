@@ -2,11 +2,11 @@
 #include "GameObject.hpp"
 
 enum BrickType {
-    normal_brick,     
-    strong_brick,     
-    exploding_brick,  
-    multi_hit_brick,   
-    super_brick        
+    normal_brick,
+    strong_brick,
+    exploding_brick,
+    multi_hit_brick,
+    super_brick
 };
 
 class Brick : public GameObject {

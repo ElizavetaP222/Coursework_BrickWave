@@ -8,10 +8,10 @@ GameState::GameState() {
 }
 
 void GameState::LoseLifeGame() {
-    deaths++;           // ещё одно падение
-    lives_game--;        // ещё одна потерянная жизнь
+    deaths++;          
+    lives_game--;       
 
-    if (deaths >= 3) {  // game over ровно после 3 падений
+    if (deaths >= 3) {  
         flag_game_over = true;
     }
 }

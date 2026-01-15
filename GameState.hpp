@@ -1,6 +1,6 @@
 #pragma once
-enum class AppMode { MainMenu, Playing, GameOver };
-enum class LifeState { Normal, RespawnWait};
+enum class AppMode { MainMenu, Playing, Pause, GameOver, NewRecord, Settings };
+enum class LifeState { Normal, RespawnWait };
 
 class GameState {
 private:
@@ -10,14 +10,14 @@ private:
     int lives_game;
     // текущий уровень
     int current_level;
-    int deaths ;
+    int deaths;
     // флаг окончания игры
     bool flag_game_over;
     // рекордный счет
     int high_score;
 
 public:
-    GameState();  
+    GameState();
     bool IsGameOver() const { return deaths >= 3; }
     // добавление очков проверка рекорда
     void AddPointsGame(int points);
@@ -35,3 +35,4 @@ public:
     int GetScore() const { return score_game; }
     int GetLives() const { return lives_game; }
 };
+

@@ -17,7 +17,6 @@ private:
 public:
     Ball();
     void SetActive(bool active);
-    // обновление позиции мяча
     void MoveBall(float delta_time);
     void BounceBall(std::string direction);
     void ActivateBall();

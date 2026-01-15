@@ -4,8 +4,7 @@
 class GameObject {
 protected:
     // координаты позиции объекта на экране
-    float pos_x;
-    float pos_y;
+    
     // размеры прямоугольного объекта
     float object_width;
     float object_height;
@@ -15,6 +14,8 @@ protected:
     bool flag_active;
 
 public:
+    float pos_x;
+    float pos_y;
     GameObject();
     virtual ~GameObject() = default;
     virtual void Deactivate() { flag_active = false; }

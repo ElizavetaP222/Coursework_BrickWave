@@ -48,8 +48,8 @@ void Brick::DrawObject(sf::RenderWindow& window) {
 
     sf::RectangleShape brick_shape(sf::Vector2f(object_width, object_height));
     brick_shape.setPosition(pos_x, pos_y);
-    brick_shape.setFillColor(GetColorByHits()); 
-    brick_shape.setOutlineThickness(1);
+    brick_shape.setFillColor(GetColorByHits());
+    brick_shape.setOutlineThickness(0.5);
     brick_shape.setOutlineColor(sf::Color::White);
     window.draw(brick_shape);
 }

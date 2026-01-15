@@ -73,10 +73,10 @@ int main() {
     // счет
     sf::Text scoreTextUI;
 
-    // таймер для новых строк кирпичей (каждые 4 секунды)
+    // таймер для новых строк кирпичей (каждые 20 секунд)
     sf::Clock gameTimer;
     float timeSinceNewRow = 0.0f;
-    const float row_interval = 4.0f;
+    const float row_interval = 20.0f;
 
     // мяч не прилипает к платформе в начале
     ball_obj.SetStuckToPaddle(false);
@@ -106,7 +106,7 @@ int main() {
     const float brickW = 55.0f, brickH = 22.0f;
     const float stepX = 65.0f, stepY = 32.0f;
     const int cols = 11;
-    const float PADDLE_LEVEL = 550.0f; // уровень платформы для game over
+    const float PADDLE_LEVEL = 550.0f;
 
     // генерация начальных кирпичей
     auto generateBricks = [&]() {
@@ -142,10 +142,10 @@ int main() {
         bool hovered = false;
         float pulse = 0.0f;
     };
-    NeonButton menuButtons[4];
+    NeonButton menuButtons[3]; 
     NeonButton goButtons[2];
     NeonButton pauseButtons[2];
-    NeonButton recordsBackButton;
+    NeonButton newRecordButtons[2];
 
     // счет в верхнем левом углу
     scoreTextUI.setFont(uiFont);
@@ -175,9 +175,8 @@ int main() {
     // цвет неонового голубого
     sf::Color neonCyan(0, 255, 255);
 
-    // главное меню - 4 кнопки
-    std::wstring menuBtnTexts[4] = { L" НАЧАТЬ ИГРУ", L" НАСТРОЙКИ", L" РЕКОРДЫ", L" ВЫХОД" };
-    for (int i = 0; i < 4; i++) {
+    std::wstring menuBtnTexts[3] = { L" НАЧАТЬ ИГРУ", L" РУКОВОДСТВО", L" ВЫХОД" };
+    for (int i = 0; i < 3; i++) {
         menuButtons[i].bg.setSize({ 360, 50 });
         menuButtons[i].bg.setFillColor(sf::Color(10, 10, 30, 200));
         menuButtons[i].bg.setOutlineThickness(3);
@@ -277,6 +276,29 @@ int main() {
         goButtons[i].text.setPosition(400, 354 + i * 60);
     }
 
+    // окно нового рекорда
+    sf::Text newRecordTitleText, newRecordResultText, newRecordOldRecordText;
+    sf::Text newRecordLineTop, newRecordLineBottom;
+
+    setupText(newRecordTitleText, L"НОВЫЙ РЕКОРД!", 45, 400.f, 80.f);
+    newRecordTitleText.setFillColor(sf::Color(255, 255, 0)); // золотой
+    setupText(newRecordLineTop, L"===============================", 22, 400.f, 130.f);
+    setupText(newRecordResultText, L"Результат: 0 очков", 28, 400.f, 180.f);
+    setupText(newRecordOldRecordText, L"Старый рекорд: 0 очков", 28, 400.f, 230.f);
+    setupText(newRecordLineBottom, L"===============================", 22, 400.f, 290.f);
+
+    newRecordLineTop.setFillColor(neonCyan);
+    newRecordLineBottom.setFillColor(neonCyan);
+    newRecordResultText.setFillColor(sf::Color(255, 255, 0));
+    newRecordOldRecordText.setFillColor(neonCyan);
+
+    // кнопки нового рекорда (копия game over)
+    std::wstring newRecordBtnTexts[2] = { L" ИГРАТЬ СНОВА", L" ВЫЙТИ" };
+    for (int i = 0; i < 2; i++) {
+        newRecordButtons[i] = goButtons[i];
+        newRecordButtons[i].text.setString(newRecordBtnTexts[i]);
+    }
+
     // оверлей паузы
     sf::RectangleShape pauseOverlay;
     pauseOverlay.setSize(sf::Vector2f(800.f, 600.f));
@@ -292,7 +314,7 @@ int main() {
     pauseTitle.setOrigin(pBounds.width / 2, pBounds.height / 2);
     pauseTitle.setPosition(400.f, 150.f);
 
-    // оверлей game over
+    // оверлей game over и рекорда
     sf::RectangleShape gameOverOverlay;
     gameOverOverlay.setSize(sf::Vector2f(800.f, 600.f));
     gameOverOverlay.setFillColor(sf::Color(0, 0, 0, 150));
@@ -325,47 +347,62 @@ int main() {
         pauseButtons[i].text.setPosition(400, 224 + i * 70);
     }
 
-    // экран рекордов
-    sf::Text recordsTitle;
-    recordsTitle.setFont(uiFont);
-    recordsTitle.setString(L"РЕКОРДЫ");
-    recordsTitle.setCharacterSize(36);
-    recordsTitle.setFillColor(neonCyan);
-    sf::FloatRect rb = recordsTitle.getLocalBounds();
-    recordsTitle.setOrigin(rb.width / 2, rb.height / 2);
-    recordsTitle.setPosition(400.f, 80.f);
+    // ЭКРАН НАСТРОЕК (информация о разработчике и правила)
+    sf::Text settingsTitle;
+    settingsTitle.setFont(uiFont);
+    settingsTitle.setString(L"РУКОВОДСТВО");
+    settingsTitle.setCharacterSize(36);
+    settingsTitle.setFillColor(neonCyan);
+    sf::FloatRect stBounds = settingsTitle.getLocalBounds();
+    settingsTitle.setOrigin(stBounds.width / 2, stBounds.height / 2);
+    settingsTitle.setPosition(400.f, 60.f);
 
-    sf::Text recordsListText;
-    recordsListText.setFont(uiFont);
-    recordsListText.setCharacterSize(22);
-    recordsListText.setFillColor(sf::Color(255, 255, 255));
-    recordsListText.setPosition(100.f, 140.f);
-    recordsListText.setOutlineThickness(1);
-    recordsListText.setOutlineColor(sf::Color::Black);
+    sf::Text settingsInfo;
+    settingsInfo.setFont(uiFont);
+    settingsInfo.setCharacterSize(20);
+    settingsInfo.setFillColor(sf::Color(255, 255, 255));
+    settingsInfo.setPosition(50.f, 100.f);
+    settingsInfo.setOutlineThickness(1);
+    settingsInfo.setOutlineColor(sf::Color::Black);
 
-    recordsBackButton.bg.setSize({ 260, 40 });
-    recordsBackButton.bg.setFillColor(sf::Color(10, 10, 30, 200));
-    recordsBackButton.bg.setOutlineThickness(3);
-    recordsBackButton.bg.setOutlineColor(sf::Color(0, 255, 255, 0));
-    recordsBackButton.bg.setOrigin(130, 20);
-    recordsBackButton.bg.setPosition(400, 500);
+    NeonButton settingsBackButton;
+    settingsBackButton.bg.setSize({ 260, 40 });
+    settingsBackButton.bg.setFillColor(sf::Color(10, 10, 30, 200));
+    settingsBackButton.bg.setOutlineThickness(3);
+    settingsBackButton.bg.setOutlineColor(sf::Color(0, 255, 255, 0));
+    settingsBackButton.bg.setOrigin(130, 20);
+    settingsBackButton.bg.setPosition(400, 500);
 
-    recordsBackButton.glow.setSize({ 270, 50 });
-    recordsBackButton.glow.setFillColor(sf::Color::Transparent);
-    recordsBackButton.glow.setOutlineThickness(5);
-    recordsBackButton.glow.setOutlineColor(sf::Color(0, 255, 255, 80));
-    recordsBackButton.glow.setOrigin(135, 25);
-    recordsBackButton.glow.setPosition(400, 500);
+    settingsBackButton.glow.setSize({ 270, 50 });
+    settingsBackButton.glow.setFillColor(sf::Color::Transparent);
+    settingsBackButton.glow.setOutlineThickness(5);
+    settingsBackButton.glow.setOutlineColor(sf::Color(0, 255, 255, 80));
+    settingsBackButton.glow.setOrigin(135, 25);
+    settingsBackButton.glow.setPosition(400, 500);
 
-    recordsBackButton.text.setFont(uiFont);
-    recordsBackButton.text.setString(L" НАЗАД В МЕНЮ");
-    recordsBackButton.text.setCharacterSize(24);
-    recordsBackButton.text.setFillColor(neonCyan);
-    recordsBackButton.text.setOutlineThickness(2);
-    recordsBackButton.text.setOutlineColor(sf::Color::Black);
-    sf::FloatRect rtb = recordsBackButton.text.getLocalBounds();
-    recordsBackButton.text.setOrigin(rtb.width / 2, rtb.height / 2);
-    recordsBackButton.text.setPosition(400, 494);
+    settingsBackButton.text.setFont(uiFont);
+    settingsBackButton.text.setString(L" НАЗАД В МЕНЮ");
+    settingsBackButton.text.setCharacterSize(24);
+    settingsBackButton.text.setFillColor(neonCyan);
+    settingsBackButton.text.setOutlineThickness(2);
+    settingsBackButton.text.setOutlineColor(sf::Color::Black);
+    sf::FloatRect sbtb = settingsBackButton.text.getLocalBounds();
+    settingsBackButton.text.setOrigin(sbtb.width / 2, sbtb.height / 2);
+    settingsBackButton.text.setPosition(400, 494);
+
+    // текст для экрана настроек
+    std::wstring settingsText = L"РАЗРАБОТЧИК:\n"
+        L"Полянская Е.О, студентка группы ПИ-42 Алтайского государственного \nтехнического университета им. И.И. Ползунова\nБарнаул, Алтайский край\n"
+        L"ПРАВИЛА ИГРЫ:\n"
+        L"Управление: стрелки влево/вправо\n"
+        L"Цель: уничтожить как можно больше кирпичей, набирая очки\n"
+        L"Каждые 20 секунд сверху появляется новый ряд кирпичей\n"
+        L"3 жизни (сердечки). Потеря жизни - мяч упал ниже платформы\n"
+        L"Игра окончена, если:\n"
+        L"- кирпичи достигли платформы\n"
+        L"- закончились жизни\n"
+        L"Удачи!";
+    settingsInfo.setString(settingsText);
 
     // курсоры мыши
     sf::Cursor handCursor, arrowCursor;
@@ -394,7 +431,7 @@ int main() {
             // обработка кликов мыши
             if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
                 if (appMode == AppMode::MainMenu) {
-                    for (int i = 0; i < 4; i++) {
+                    for (int i = 0; i < 3; i++) {
                         if (menuButtons[i].bg.getGlobalBounds().contains(mousePos)) {
                             if (i == 0) {
                                 // начать игру
@@ -412,23 +449,13 @@ int main() {
                                 ball_obj.SetStuckToPaddle(false);
                                 ball_obj.vector_x = 210;
                                 ball_obj.vector_y = -240;
+                                allowGameOver = true;
+                            }
+                            else if (i == 1) {
+                                // настройки
+                                appMode = AppMode::Settings;
                             }
                             else if (i == 2) {
-                                // рекорды
-                                appMode = AppMode::Records;
-                                std::wstring list;
-                                if (scoreHistory.empty()) {
-                                    list = L"Пока нет сыгранных игр";
-                                }
-                                else {
-                                    for (size_t idx = 0; idx < scoreHistory.size(); ++idx) {
-                                        list += std::to_wstring(idx + 1) + L". ";
-                                        list += std::to_wstring(scoreHistory[idx]) + L" очков\n";
-                                    }
-                                }
-                                recordsListText.setString(list);
-                            }
-                            else if (i == 3) {
                                 saveScores();
                                 window.close();
                             }
@@ -441,9 +468,11 @@ int main() {
                         appMode = AppMode::Pause;
                     }
                 }
-                else if (appMode == AppMode::GameOver) {
+                else if (appMode == AppMode::GameOver || appMode == AppMode::NewRecord) {
+                    // обработка одинаковых кнопок для обоих экранов
+                    NeonButton* buttons = (appMode == AppMode::GameOver) ? goButtons : newRecordButtons;
                     for (int i = 0; i < 2; i++) {
-                        if (goButtons[i].bg.getGlobalBounds().contains(mousePos)) {
+                        if (buttons[i].bg.getGlobalBounds().contains(mousePos)) {
                             if (i == 0) {
                                 // играть снова
                                 appMode = AppMode::Playing;
@@ -460,6 +489,7 @@ int main() {
                                 ball_obj.SetStuckToPaddle(false);
                                 ball_obj.vector_x = 210;
                                 ball_obj.vector_y = -240;
+                                allowGameOver = true;
                             }
                             else {
                                 appMode = AppMode::MainMenu;
@@ -477,21 +507,21 @@ int main() {
                         }
                     }
                 }
-                else if (appMode == AppMode::Records) {
-                    if (recordsBackButton.bg.getGlobalBounds().contains(mousePos)) {
+                else if (appMode == AppMode::Settings) {
+                    if (settingsBackButton.bg.getGlobalBounds().contains(mousePos)) {
                         appMode = AppMode::MainMenu;
                     }
                 }
             }
         }
 
-        // анимация кнопок и курсор
+        // анимация кнопок и смена курсора
         sf::Vector2f mouseF = window.mapPixelToCoords(sf::Mouse::getPosition(window));
         bool anyButtonHovered = false;
 
-        // главное меню - анимация кнопок
+        // главное меню анимация (3 кнопки)
         if (appMode == AppMode::MainMenu) {
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < 3; i++) {
                 bool hovered = menuButtons[i].bg.getGlobalBounds().contains(mouseF);
                 menuButtons[i].hovered = hovered;
                 if (hovered) anyButtonHovered = true;
@@ -512,7 +542,7 @@ int main() {
             }
         }
 
-        // game over - анимация кнопок
+        // остальные анимации кнопок (game over, new record, pause, settings)
         if (appMode == AppMode::GameOver) {
             for (int i = 0; i < 2; i++) {
                 bool hovered = goButtons[i].bg.getGlobalBounds().contains(mouseF);
@@ -535,7 +565,28 @@ int main() {
             }
         }
 
-        // пауза - анимация кнопок
+        if (appMode == AppMode::NewRecord) {
+            for (int i = 0; i < 2; i++) {
+                bool hovered = newRecordButtons[i].bg.getGlobalBounds().contains(mouseF);
+                newRecordButtons[i].hovered = hovered;
+                if (hovered) anyButtonHovered = true;
+                newRecordButtons[i].pulse += dt * 2.0f;
+                float glowAlpha = 80 + 50 * sinf(newRecordButtons[i].pulse);
+                if (hovered) {
+                    newRecordButtons[i].bg.setFillColor(sf::Color(20, 100, 200, 240));
+                    newRecordButtons[i].bg.setOutlineColor(sf::Color(0, 255, 255, 255));
+                    newRecordButtons[i].glow.setOutlineColor(sf::Color(0, 255, 255, glowAlpha + 100));
+                    newRecordButtons[i].text.setFillColor(sf::Color::White);
+                }
+                else {
+                    newRecordButtons[i].bg.setFillColor(sf::Color(10, 10, 30, 200));
+                    newRecordButtons[i].bg.setOutlineColor(sf::Color(0, 255, 255, 150));
+                    newRecordButtons[i].glow.setOutlineColor(sf::Color(0, 255, 255, glowAlpha));
+                    newRecordButtons[i].text.setFillColor(neonCyan);
+                }
+            }
+        }
+
         if (appMode == AppMode::Pause) {
             for (int i = 0; i < 2; i++) {
                 bool hovered = pauseButtons[i].bg.getGlobalBounds().contains(mouseF);
@@ -558,24 +609,23 @@ int main() {
             }
         }
 
-        // рекорды - анимация кнопки
-        if (appMode == AppMode::Records) {
-            bool hovered = recordsBackButton.bg.getGlobalBounds().contains(mouseF);
-            recordsBackButton.hovered = hovered;
+        if (appMode == AppMode::Settings) {
+            bool hovered = settingsBackButton.bg.getGlobalBounds().contains(mouseF);
+            settingsBackButton.hovered = hovered;
             if (hovered) anyButtonHovered = true;
-            recordsBackButton.pulse += dt * 2.0f;
-            float glowAlpha = 80 + 50 * sinf(recordsBackButton.pulse);
+            settingsBackButton.pulse += dt * 2.0f;
+            float glowAlpha = 80 + 50 * sinf(settingsBackButton.pulse);
             if (hovered) {
-                recordsBackButton.bg.setFillColor(sf::Color(20, 100, 200, 240));
-                recordsBackButton.bg.setOutlineColor(sf::Color(0, 255, 255, 255));
-                recordsBackButton.glow.setOutlineColor(sf::Color(0, 255, 255, glowAlpha + 100));
-                recordsBackButton.text.setFillColor(sf::Color::White);
+                settingsBackButton.bg.setFillColor(sf::Color(20, 100, 200, 240));
+                settingsBackButton.bg.setOutlineColor(sf::Color(0, 255, 255, 255));
+                settingsBackButton.glow.setOutlineColor(sf::Color(0, 255, 255, glowAlpha + 100));
+                settingsBackButton.text.setFillColor(sf::Color::White);
             }
             else {
-                recordsBackButton.bg.setFillColor(sf::Color(10, 10, 30, 200));
-                recordsBackButton.bg.setOutlineColor(sf::Color(0, 255, 255, 150));
-                recordsBackButton.glow.setOutlineColor(sf::Color(0, 255, 255, glowAlpha));
-                recordsBackButton.text.setFillColor(neonCyan);
+                settingsBackButton.bg.setFillColor(sf::Color(10, 10, 30, 200));
+                settingsBackButton.bg.setOutlineColor(sf::Color(0, 255, 255, 150));
+                settingsBackButton.glow.setOutlineColor(sf::Color(0, 255, 255, glowAlpha));
+                settingsBackButton.text.setFillColor(neonCyan);
             }
         }
 
@@ -595,7 +645,7 @@ int main() {
 
             static bool justGeneratedBricks = false;
 
-            // генерация нового ряда кирпичей
+            // генерация нового ряда кирпичей каждые 20 секунд
             timeSinceNewRow = gameTimer.getElapsedTime().asSeconds();
             if (timeSinceNewRow >= row_interval && !justGeneratedBricks) {
                 justGeneratedBricks = true;
@@ -634,7 +684,7 @@ int main() {
                 justGeneratedBricks = false;
             }
 
-            // проверка условия game over
+            // проверка условий окончания игры
             bool bricksReachedPaddle = false;
             for (const auto& brick : bricks) {
                 if (brick.GetBoundingBox().top >= 496) {
@@ -649,19 +699,39 @@ int main() {
                     break;
                 }
             }
+
             if ((bricksReachedPaddle || allHeartsDead) && allowGameOver) {
-                appMode = AppMode::GameOver;
                 int score = game_state_obj.GetScore();
                 scoreHistory.push_back(score);
                 saveScores();
+
+                // находим текущий рекорд
                 int record = 0;
                 if (!scoreHistory.empty()) {
                     record = *std::max_element(scoreHistory.begin(), scoreHistory.end());
                 }
-                goResultText.setString(L"Результат: " + std::to_wstring(score) + L" очков");
-                goRecordText.setString(L"Рекорд: " + std::to_wstring(record) + L" очков");
-                centerText(goResultText);
-                centerText(goRecordText);
+
+                // проверка на новый рекорд
+                if (score == record) { // новый рекорд (последний результат = максимум)
+                    appMode = AppMode::NewRecord;
+                    newRecordResultText.setString(L"Результат: " + std::to_wstring(score) + L" очков");
+                    int oldRecord = 0;
+                    // ищем предпоследний максимум для старого рекорда
+                    for (int s : scoreHistory) {
+                        if (s != score && s > oldRecord) oldRecord = s;
+                    }
+                    newRecordOldRecordText.setString(L"Старый рекорд: " + std::to_wstring(oldRecord) + L" очков");
+                    centerText(newRecordResultText);
+                    centerText(newRecordOldRecordText);
+                }
+                else {
+                    // обычный game over
+                    appMode = AppMode::GameOver;
+                    goResultText.setString(L"Результат: " + std::to_wstring(score) + L" очков");
+                    goRecordText.setString(L"Рекорд: " + std::to_wstring(record) + L" очков");
+                    centerText(goResultText);
+                    centerText(goRecordText);
+                }
             }
             else {
                 // обычная физика игры
@@ -692,7 +762,7 @@ int main() {
             }
         }
 
-        // таймер задержки game over
+        // таймер задержки game over после генерации рядов
         if (!allowGameOver && gameOverTimer.getElapsedTime().asSeconds() > 1.5f) {
             allowGameOver = true;
         }
@@ -704,7 +774,7 @@ int main() {
         if (appMode == AppMode::MainMenu) {
             window.draw(titleGlow);
             window.draw(titleText);
-            for (int i = 0; i < 4; i++) {
+            for (int i = 0; i < 3; i++) {
                 window.draw(menuButtons[i].glow);
                 window.draw(menuButtons[i].bg);
                 window.draw(menuButtons[i].text);
@@ -722,7 +792,7 @@ int main() {
             for (auto& brick : bricks) brick.DrawObject(window);
         }
         else if (appMode == AppMode::Pause) {
-            // рисуем игру замороженной
+            // игра заморожена
             window.draw(scoreTextUI);
             window.draw(pauseButtonBg);
             window.draw(pauseBar1);
@@ -732,6 +802,7 @@ int main() {
             paddle_obj.DrawObject(window);
             ball_obj.DrawObject(window);
             for (auto& brick : bricks) brick.DrawObject(window);
+
             window.draw(pauseOverlay);
             window.draw(pauseTitle);
             for (int i = 0; i < 2; i++) {
@@ -741,7 +812,7 @@ int main() {
             }
         }
         else if (appMode == AppMode::GameOver) {
-            // рисуем игру замороженной под оверлеем
+            // игра заморожена под оверлеем
             window.draw(scoreTextUI);
             window.draw(pauseButtonBg);
             window.draw(pauseBar1);
@@ -753,8 +824,6 @@ int main() {
             for (auto& brick : bricks) brick.DrawObject(window);
 
             window.draw(gameOverOverlay);
-
-            // текст game over поверх
             window.draw(goTitleText);
             window.draw(goLineTop);
             window.draw(goResultText);
@@ -766,12 +835,37 @@ int main() {
                 window.draw(goButtons[i].text);
             }
         }
-        else if (appMode == AppMode::Records) {
-            window.draw(recordsTitle);
-            window.draw(recordsListText);
-            window.draw(recordsBackButton.glow);
-            window.draw(recordsBackButton.bg);
-            window.draw(recordsBackButton.text);
+        else if (appMode == AppMode::NewRecord) {
+            // игра заморожена под оверлеем нового рекорда
+            window.draw(scoreTextUI);
+            window.draw(pauseButtonBg);
+            window.draw(pauseBar1);
+            window.draw(pauseBar2);
+            for (int i = 0; i < 3; i++)
+                if (heartActive[i]) window.draw(heartSprites[i]);
+            paddle_obj.DrawObject(window);
+            ball_obj.DrawObject(window);
+            for (auto& brick : bricks) brick.DrawObject(window);
+
+            window.draw(gameOverOverlay);
+            window.draw(newRecordTitleText);
+            window.draw(newRecordLineTop);
+            window.draw(newRecordResultText);
+            window.draw(newRecordOldRecordText);
+            window.draw(newRecordLineBottom);
+            for (int i = 0; i < 2; i++) {
+                window.draw(newRecordButtons[i].glow);
+                window.draw(newRecordButtons[i].bg);
+                window.draw(newRecordButtons[i].text);
+            }
+        }
+        else if (appMode == AppMode::Settings) {
+            // экран настроек
+            window.draw(settingsTitle);
+            window.draw(settingsInfo);
+            window.draw(settingsBackButton.glow);
+            window.draw(settingsBackButton.bg);
+            window.draw(settingsBackButton.text);
         }
 
         window.display();
@@ -781,5 +875,3 @@ int main() {
     saveScores();
     return 0;
 }
-
-
